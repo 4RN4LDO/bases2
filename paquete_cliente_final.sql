@@ -1,6 +1,6 @@
 CREATE OR REPLACE PACKAGE pck_cliente IS
   PROCEDURE consEventoCliente(
-    p_cedula_cliente IN OUT EVENTO.CEDULA_CLIENTE%TYPE,
+    p_cedula_cliente IN EVENTO.CEDULA_CLIENTE%TYPE,
     p_fecha OUT NOCOPY EVENTO.FECHA%TYPE,
     p_hora OUT NOCOPY EVENTO.HORA%TYPE,
     p_lugar OUT NOCOPY EVENTO.LUGAR%TYPE,
@@ -31,16 +31,23 @@ END pck_cliente;
 CREATE OR REPLACE PACKAGE BODY pck_cliente AS
   --select
   PROCEDURE consEventoCliente(
-    p_cedula_cliente IN OUT EVENTO.CEDULA_CLIENTE%TYPE,
+    p_cedula_cliente IN EVENTO.CEDULA_CLIENTE%TYPE,
     p_fecha OUT NOCOPY EVENTO.FECHA%TYPE,
     p_hora OUT NOCOPY EVENTO.HORA%TYPE,
     p_lugar OUT NOCOPY EVENTO.LUGAR%TYPE,
     p_status OUT NOCOPY EVENTO.STATUS%TYPE) IS
   BEGIN
-    SELECT fecha, hora, lugar, status
-    INTO p_fecha, p_hora, p_lugar, p_status
-    FROM EVENTO
-    WHERE cedula_cliente = p_cedula_cliente;
+    for c_evento IN (
+      SELECT fecha, hora, lugar, status
+      FROM EVENTO WHERE cedula_cliente = p_cedula_cliente
+    )
+    loop
+      p_fecha := c_evento.fecha;
+      p_hora := c_evento.hora;
+      p_lugar := c_evento.lugar;
+      p_status := c_evento.status;
+    end loop;
+    
   END consEventoCliente;
 
   --insert

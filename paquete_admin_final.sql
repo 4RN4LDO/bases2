@@ -1,6 +1,3 @@
---Procedimiento para insertar y modificar género e instrumento 
---en un paquete tipo Admin junto con mostrar, eliminar a presentador, 
---cliente, instrumento o género
 CREATE OR REPLACE PACKAGE pck_admin IS
   PROCEDURE consInstrumento(
     p_id_instrumento IN OUT INSTRUMENTO.ID_INSTRUMENTO%TYPE,

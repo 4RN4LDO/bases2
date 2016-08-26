@@ -48,24 +48,42 @@ before UPDATE
 ON EVENTO
 for each row
 DECLARE
+  v_id_presentador number;
   v_id_genero number;
-
-  CURSOR testCursor
-  IS 
-    SELECT genero_id_genero
-    FROM GENERO_PRESENTADOR
-    WHERE presentador_cedula_presentador = :old.presentador_cedula_presentador
-
 BEGIN
-  v_id_genero := :old.id_genero;
-
-  for genero_rec in testCursor
-  LOOP
-    if v_id_genero != genero_rec.genero_id_genero THEN
-      raise_application_error( -20001, 'Bandas no pueden registrar instrumentos');
+  v_id_presentador := :new.presentador_cedula_presentador;
+  v_id_genero := :new.genero_id_genero;
+if not exists(
+  select 1 
+  from GENERO_PRESENTADOR 
+  where presentador_cedula_presentador = v_id_presentador
+  and genero_id_genero = v_id_presentador) THEN
+      raise_application_error( -20001, 'El genero no conicide con su listado de géneros');
     end if;
-  END LOOP;
+END;
+/
+show errors
 
+
+create OR replace trigger tr_genero_evento_update
+before UPDATE
+ON EVENTO
+for each row
+DECLARE
+  cursor v_cursor 
+  is 
+    select * from GENERO_PRESENTADOR 
+    where presentador_cedula_presentador = :new.presentador_cedula_presentador
+  -- v_id_presentador number;
+  -- v_id_genero number;
+BEGIN
+  -- v_id_presentador := :new.presentador_cedula_presentador;
+  -- v_id_genero := :new.genero_id_genero;
+  for datos in v_cursor loop
+    if :old.genero_id_genero != :old.id_genero THEN
+      raise_application_error( -20001, 'El genero no conicide con su listado de géneros');
+    end if;
+  end loop;
 END;
 /
 show errors

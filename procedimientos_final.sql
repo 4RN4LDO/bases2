@@ -56,9 +56,12 @@ END updStatusEvento;
 
 DROP SEQUENCE sq_id_instrumento;
 CREATE SEQUENCE sq_id_instrumento START WITH 1000 INCREMENT BY 1;
+SELECT sq_id_instrumento.nextval FROM DUAL;
 DROP SEQUENCE sq_id_genero;
 CREATE SEQUENCE sq_id_genero START WITH 100 INCREMENT BY 1;
+SELECT sq_id_genero.nextval FROM DUAL;
 DROP SEQUENCE sq_id_evento;
 CREATE SEQUENCE sq_id_evento START WITH 10000 INCREMENT BY 1;
+SELECT sq_id_evento.nextval FROM DUAL;
 
 

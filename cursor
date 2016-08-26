@@ -1,0 +1,86 @@
+PROCEDURE getEventoTipoPresentador(
+    p_id_tipo IN EVENTO.ID_TIPO%TYPE,
+    p_fecha OUT NOCOPY EVENTO.FECHA%TYPE,
+    p_hora OUT NOCOPY EVENTO.HORA%TYPE,
+    p_lugar OUT NOCOPY EVENTO.LUGAR%TYPE) IS
+    
+    cnumber date;
+    chora timestamp;
+    clugar varchar2;
+
+    cursor c1
+    IS
+      SELECT fecha, hora, lugar
+      INTO p_fecha, p_hora, p_lugar
+      FROM EVENTO WHERE id_tipo = p_id_tipo;
+  BEGIN
+    open c1;
+    loop
+      fecth c1 into cnumber, chora, clugar
+    end loop;
+    close c1;
+  END getEventoTipoPresentador;
+  /
+
+  PROCEDURE getEventoTipoPresentador(
+    p_id_tipo IN EVENTO.ID_TIPO%TYPE,
+    p_fecha OUT EVENTO.FECHA%TYPE,
+    p_hora OUT EVENTO.HORA%TYPE,
+    p_lugar OUT EVENTO.LUGAR%TYPE) IS
+
+    cnumber date;
+    chora timestamp;
+    clugar varchar2(25);
+  BEGIN
+    for c IN (
+      SELECT fecha, hora, lugar
+      FROM EVENTO WHERE id_tipo = p_id_tipo
+    )
+    loop
+      cnumber := c.fecha;
+      chora := c.hora;
+      clugar := c.lugar;
+    end loop;
+
+  END getEventoTipoPresentador;
+  /
+  show errors;
+
+
+  create or replace PACKAGE BODY pck_presentador AS
+  --select
+  PROCEDURE getEventoTipoPresentador(
+    p_id_tipo IN EVENTO.ID_TIPO%TYPE,
+    p_fecha OUT EVENTO.FECHA%TYPE,
+    p_hora OUT EVENTO.HORA%TYPE,
+    p_lugar OUT EVENTO.LUGAR%TYPE) IS
+  BEGIN
+    for c IN (
+      SELECT fecha, hora, lugar
+      FROM EVENTO WHERE id_tipo = p_id_tipo
+    )
+    loop
+      p_fecha := c.fecha;
+      p_hora := c.hora;
+      p_lugar := c.lugar;
+    end loop;
+
+  END getEventoTipoPresentador;
+
+  --update status
+  PROCEDURE updStatusEventoPresentador(
+    p_id_evento IN EVENTO.ID_EVENTO%TYPE) IS
+
+    stat varchar2(10);
+  BEGIN
+    SELECT STATUS
+    INTO stat
+    FROM EVENTO;
+
+    if stat = 'Abierto' then
+      UPDATE EVENTO e
+      SET e.STATUS = 'Pendiente'
+      WHERE e.ID_EVENTO = p_id_evento;
+    end if;
+  END updStatusEventoPresentador;
+END pck_presentador;

@@ -3,25 +3,30 @@ CREATE OR REPLACE PACKAGE pck_presentador IS
     p_id_tipo IN EVENTO.ID_TIPO%TYPE,
     p_fecha OUT NOCOPY EVENTO.FECHA%TYPE,
     p_hora OUT NOCOPY EVENTO.HORA%TYPE,
-    p_lugar OUT NOCOPY EVENTO.LUGAR%TYPE,
-    p_genero OUT NOCOPY EVENTO.ID_GENERO%TYPE);
+    p_lugar OUT NOCOPY EVENTO.LUGAR%TYPE);
   PROCEDURE updStatusEventoPresentador(
     p_id_evento IN EVENTO.ID_EVENTO%TYPE);
 END pck_presentador;
 /
 
-CREATE OR REPLACE PACKAGE BODY pck_presentador AS
+create or replace PACKAGE BODY pck_presentador AS
   --select
   PROCEDURE getEventoTipoPresentador(
     p_id_tipo IN EVENTO.ID_TIPO%TYPE,
-    p_fecha OUT NOCOPY EVENTO.FECHA%TYPE,
-    p_hora OUT NOCOPY EVENTO.HORA%TYPE,
-    p_lugar OUT NOCOPY EVENTO.LUGAR%TYPE,
-    p_genero OUT NOCOPY EVENTO.ID_GENERO%TYPE) IS
+    p_fecha OUT EVENTO.FECHA%TYPE,
+    p_hora OUT EVENTO.HORA%TYPE,
+    p_lugar OUT EVENTO.LUGAR%TYPE) IS
   BEGIN
-    SELECT fecha, hora, lugar, id_genero
-    INTO p_fecha, p_hora, p_lugar, p_genero
-    FROM EVENTO WHERE id_tipo = p_id_tipo;
+    for c_evento IN (
+      SELECT fecha, hora, lugar
+      FROM EVENTO WHERE id_tipo = p_id_tipo
+    )
+    loop
+      p_fecha := c_evento.fecha;
+      p_hora := c_evento.hora;
+      p_lugar := c_evento.lugar;
+    end loop;
+
   END getEventoTipoPresentador;
 
   --update status
@@ -30,9 +35,10 @@ CREATE OR REPLACE PACKAGE BODY pck_presentador AS
 
     stat varchar2(10);
   BEGIN
-    SELECT STATUS
+    SELECT status
     INTO stat
-    FROM EVENTO;
+    FROM EVENTO
+    FOR UPDATE of status nowait;
 
     if stat = 'Abierto' then
       UPDATE EVENTO e
@@ -42,4 +48,4 @@ CREATE OR REPLACE PACKAGE BODY pck_presentador AS
   END updStatusEventoPresentador;
 END pck_presentador;
 /
-show errors
+show errors;
